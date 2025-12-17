@@ -1,0 +1,189 @@
+:root {
+  --bg-color: #000000;
+  --card-bg: #0a0a0a;
+  --text-primary: #ffffff;
+  --text-secondary: #888888;
+  --border-color: #222222;
+  --hover-border: #ffffff;
+  --font-main: 'Inter', sans-serif;
+  --transition-speed: 0.3s;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: var(--bg-color);
+  color: var(--text-primary);
+  font-family: var(--font-main);
+  min-height: 100vh;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+#app {
+  width: 100%;
+  max-width: 1200px;
+  padding: 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4rem;
+}
+
+/* Header */
+.landing-header {
+  text-align: center;
+  /* Add a subtle animation on load */
+  animation: fadeInDown 0.8s ease-out forwards;
+}
+
+.brand-title {
+  font-size: 5rem;
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  margin-bottom: 1rem;
+  background: linear-gradient(180deg, #fff 0%, #aaa 100%);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.brand-subtitle {
+  color: var(--text-secondary);
+  font-size: 1.125rem;
+  font-weight: 400;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+/* System Selection Grid */
+.system-selection {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.5rem;
+  width: 100%;
+  perspective: 1000px;
+  /* For potential 3D tilts later */
+}
+
+/* Cards */
+.card {
+  background-color: var(--card-bg);
+  border: 1px solid var(--border-color);
+  border-radius: 12px;
+  padding: 3rem 2rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  cursor: pointer;
+  transition: all var(--transition-speed) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  position: relative;
+  overflow: hidden;
+  height: 100%;
+  aspect-ratio: 4/5;
+  /* Keep consistent shape */
+  justify-content: center;
+  /* Initial state for animation */
+  opacity: 0;
+  transform: translateY(50px);
+}
+
+.card.visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.card:hover {
+  border-color: var(--hover-border);
+  transform: translateY(-5px);
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
+/* Active/Selected state mostly for demo/future */
+.card.active {
+  border-color: var(--hover-border);
+  box-shadow: 0 0 0 2px var(--hover-border);
+}
+
+.card-content {
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem;
+  height: 100%;
+  justify-content: center;
+}
+
+.icon-container {
+  background: #1a1a1a;
+  width: 80px;
+  height: 80px;
+  border-radius: 20px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin-bottom: 0.5rem;
+  transition: transform var(--transition-speed) ease;
+}
+
+.icon-container i {
+  font-size: 3rem;
+  color: var(--text-primary);
+}
+
+.card:hover .icon-container {
+  transform: scale(1.1);
+  background: #252525;
+}
+
+.card h2 {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.card p {
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.5;
+  max-width: 250px;
+}
+
+/* Responsive */
+@media (max-width: 900px) {
+  .system-selection {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 600px) {
+  .system-selection {
+    grid-template-columns: 1fr;
+  }
+
+  .brand-title {
+    font-size: 3.5rem;
+  }
+}
+
+/* Animations */
+@keyframes fadeInDown {
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>TNKR - Interactive 3D Component Explorer</title>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <link rel="stylesheet" href="./src/style.css">
+  </head>
+  <body>
+    <div id="app">
+      <header class="landing-header">
+        <h1 class="brand-title">TNKR</h1>
+        <p class="brand-subtitle">Visualizing and understanding real world systems in 3D</p>
+      </header>
+      
+      <main class="system-selection">
+        <div class="card" data-system="table">
+          <div class="card-content">
+            <div class="icon-container">
+              <i class="ph ph-table"></i>
+            </div>
+            <h2>Table</h2>
+            <p>Explore dining and workspace furniture systems</p>
+          </div>
+          <div class="card-glow"></div>
+        </div>
+
+        <div class="card" data-system="laptop">
+          <div class="card-content">
+            <div class="icon-container">
+              <i class="ph ph-laptop"></i>
+            </div>
+            <h2>Laptop</h2>
+            <p>Understand computing device architecture</p>
+          </div>
+          <div class="card-glow"></div>
+        </div>
+
+        <div class="card" data-system="vehicle">
+          <div class="card-content">
+            <div class="icon-container">
+              <i class="ph ph-car-profile"></i>
+            </div>
+            <h2>Electric Vehicle</h2>
+            <p>Visualize sustainable transportation systems</p>
+          </div>
+          <div class="card-glow"></div>
+        </div>
+      </main>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>

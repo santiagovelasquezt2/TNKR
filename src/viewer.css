@@ -1,0 +1,164 @@
+/* Inherit base vars from style.css manually or import if using a preprocessor (but we are vanilla CSS) */
+/* We'll just redefine core vars or rely on main style.css if imported. 
+   But viewer.html will link valid CSS. Let's create a dedicated css file that imports style.css or just shares logic.
+   Actually easier to just have specific viewer styles here.
+*/
+
+:root {
+    --sidebar-width: 350px;
+    --bg-color: #000000;
+    --text-primary: #ffffff;
+    --text-secondary: #888888;
+    --accent-color: #4444ff;
+    --border-color: #222222;
+}
+
+body {
+    margin: 0;
+    overflow: hidden;
+    /* No scroll on viewer page */
+    background: var(--bg-color);
+    color: var(--text-primary);
+    font-family: 'Inter', sans-serif;
+    display: flex;
+    height: 100vh;
+}
+
+#viewer-container {
+    flex-grow: 1;
+    position: relative;
+    height: 100%;
+}
+
+canvas {
+    width: 100%;
+    height: 100%;
+    outline: none;
+}
+
+#sidebar {
+    width: var(--sidebar-width);
+    height: 100%;
+    background: rgba(10, 10, 10, 0.95);
+    border-left: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 1.5rem;
+    z-index: 10;
+    backdrop-filter: blur(10px);
+}
+
+.back-button {
+    background: transparent;
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.9rem;
+    width: fit-content;
+    margin-bottom: 2rem;
+    transition: all 0.2s;
+    text-decoration: none;
+}
+
+.back-button:hover {
+    border-color: var(--text-primary);
+    color: var(--text-primary);
+}
+
+.system-title {
+    font-size: 2rem;
+    font-weight: 700;
+    margin-bottom: 0.5rem;
+}
+
+.system-desc {
+    color: var(--text-secondary);
+    font-size: 1rem;
+    margin-bottom: 2rem;
+    line-height: 1.5;
+}
+
+.controls {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.action-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    background: #1a1a1a;
+    color: white;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.2s;
+}
+
+.action-btn:hover {
+    background: #252525;
+    border-color: var(--text-primary);
+}
+
+.action-btn.active {
+    background: var(--accent-color);
+    border-color: var(--accent-color);
+}
+
+.parts-list {
+    flex-grow: 1;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.part-item {
+    padding: 12px;
+    border-radius: 8px;
+    background: transparent;
+    cursor: pointer;
+    transition: background 0.2s;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.part-item:hover {
+    background: rgba(255, 255, 255, 0.05);
+}
+
+.part-item.selected {
+    background: rgba(68, 68, 255, 0.2);
+    border: 1px solid var(--accent-color);
+}
+
+.part-name {
+    font-weight: 500;
+}
+
+.part-info {
+    margin-top: auto;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-color);
+}
+
+/* Scrollbar styling */
+.parts-list::-webkit-scrollbar {
+    width: 6px;
+}
+
+.parts-list::-webkit-scrollbar-track {
+    background: transparent;
+}
+
+.parts-list::-webkit-scrollbar-thumb {
+    background: #333;
+    border-radius: 3px;
+}
