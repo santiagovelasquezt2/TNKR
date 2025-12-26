@@ -1,79 +1,192 @@
+/**
+ * ================================================================================
+ * TNKR - Interactive 3D Component Explorer
+ * ================================================================================
+ * FILE: src/style.css
+ * PURPOSE: Landing page styles
+ * 
+ * DESCRIPTION:
+ * This stylesheet defines the visual appearance of the TNKR landing page
+ * (index.html). It implements a modern, dark-themed design with interactive
+ * system selection cards that feature smooth animations and hover effects.
+ * 
+ * DESIGN PHILOSOPHY:
+ * - Dark theme (#000000 background) for a modern, professional look
+ * - Minimal color palette (white, gray, black) with accent on interaction
+ * - Smooth transitions for all interactive elements
+ * - Card-based layout for system selection
+ * - Responsive grid that adapts to mobile devices
+ * 
+ * KEY COMPONENTS:
+ * - CSS Variables (custom properties) for consistent theming
+ * - Header with gradient text effect
+ * - System selection card grid with hover animations
+ * - Icon containers with scale effects
+ * - Entrance animation for cards (fadeInDown)
+ * 
+ * ANIMATIONS:
+ * - Cards fade in and slide up on page load (controlled by main.js + GSAP)
+ * - Cards lift up on hover with shadow effect
+ * - Icon containers scale up on card hover
+ * - Header fades in from above on load (CSS keyframe)
+ * 
+ * DEPENDENCIES:
+ * - Google Fonts: Inter (loaded in index.html)
+ * - main.js handles additional JavaScript-based animations
+ * 
+ * AUTHOR: TNKR Development Team
+ * ================================================================================
+ */
+
+/* ==========================================================================
+   CSS CUSTOM PROPERTIES (VARIABLES)
+   ========================================================================== 
+   
+   These variables define the core design tokens for the landing page.
+   Using CSS custom properties allows easy theming and consistent values.
+*/
 :root {
+  /* Background color - pure black for modern dark theme */
   --bg-color: #000000;
+
+  /* Card background - slightly lighter than pure black */
   --card-bg: #0a0a0a;
+
+  /* Primary text color - white for high contrast */
   --text-primary: #ffffff;
+
+  /* Secondary text color - medium gray for less important text */
   --text-secondary: #888888;
+
+  /* Default border color - subtle dark gray */
   --border-color: #222222;
+
+  /* Hover state border color - white for clear feedback */
   --hover-border: #ffffff;
+
+  /* Primary font family - Inter for modern, clean typography */
   --font-main: 'Inter', sans-serif;
+
+  /* Standard transition speed for hover effects */
   --transition-speed: 0.3s;
 }
 
+/* ==========================================================================
+   RESET & BASE STYLES
+   ========================================================================== 
+   
+   Basic reset and body styling for consistent rendering across browsers.
+*/
+
+/* Box-sizing reset - makes padding/border included in element width */
 * {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
 }
 
+/* Body - centers content both horizontally and vertically */
 body {
   background-color: var(--bg-color);
   color: var(--text-primary);
   font-family: var(--font-main);
   min-height: 100vh;
+  /* Full viewport height */
   display: flex;
   justify-content: center;
+  /* Center horizontally */
   align-items: center;
+  /* Center vertically */
   overflow-x: hidden;
+  /* Prevent horizontal scroll */
   -webkit-font-smoothing: antialiased;
+  /* Smooth font rendering on Mac */
 }
 
+/* ==========================================================================
+   APP CONTAINER
+   ========================================================================== 
+   
+   Main container that holds the header and card grid.
+   Constrained to max-width for readability on large screens.
+*/
 #app {
   width: 100%;
   max-width: 1200px;
+  /* Maximum width for content */
   padding: 2rem;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: 4rem;
+  /* Spacing between header and cards */
 }
 
-/* Header */
+/* ==========================================================================
+   HEADER SECTION
+   ========================================================================== 
+   
+   Brand title and subtitle at the top of the page.
+*/
+
+/* Header container with entrance animation */
 .landing-header {
   text-align: center;
-  /* Add a subtle animation on load */
+  /* Entrance animation - fades in from above */
   animation: fadeInDown 0.8s ease-out forwards;
 }
 
+/* Brand title - large gradient text "TNKR" */
 .brand-title {
   font-size: 5rem;
   font-weight: 800;
+  /* Extra bold */
   letter-spacing: -0.02em;
+  /* Slight negative tracking for tight look */
   margin-bottom: 1rem;
+
+  /* Gradient text effect - white to gray */
   background: linear-gradient(180deg, #fff 0%, #aaa 100%);
   background-clip: text;
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
 }
 
+/* Subtitle - app description */
 .brand-subtitle {
   color: var(--text-secondary);
   font-size: 1.125rem;
   font-weight: 400;
   max-width: 600px;
+  /* Limit line length for readability */
   margin: 0 auto;
 }
 
-/* System Selection Grid */
+/* ==========================================================================
+   SYSTEM SELECTION GRID
+   ========================================================================== 
+   
+   Grid layout for the system selection cards.
+   Uses CSS Grid for responsive layout.
+*/
 .system-selection {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
+  /* 3 equal columns */
   gap: 1.5rem;
   width: 100%;
   perspective: 1000px;
-  /* For potential 3D tilts later */
+  /* For potential 3D card tilt effects */
 }
 
-/* Cards */
+/* ==========================================================================
+   CARD STYLES
+   ========================================================================== 
+   
+   Interactive cards for selecting a system to explore.
+*/
+
+/* Base card styling */
 .card {
   background-color: var(--card-bg);
   border: 1px solid var(--border-color);
@@ -84,35 +197,46 @@ body {
   align-items: center;
   text-align: center;
   cursor: pointer;
+
+  /* Smooth transition for all properties on hover/active */
   transition: all var(--transition-speed) cubic-bezier(0.25, 0.46, 0.45, 0.94);
+
   position: relative;
   overflow: hidden;
   height: 100%;
   aspect-ratio: 4/5;
-  /* Keep consistent shape */
+  /* Maintain consistent card shape */
   justify-content: center;
-  /* Initial state for animation */
+
+  /* Initial state for entrance animation (hidden, offset down) */
+  /* GSAP animates these to visible state */
   opacity: 0;
   transform: translateY(50px);
 }
 
+/* Visible state after animation completes (fallback) */
 .card.visible {
   opacity: 1;
   transform: translateY(0);
 }
 
+/* Hover state - lifts card and adds shadow */
 .card:hover {
   border-color: var(--hover-border);
   transform: translateY(-5px);
+  /* Lift up */
   box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+  /* Floating shadow */
 }
 
-/* Active/Selected state mostly for demo/future */
+/* Active/selected state - for future multi-selection or demo */
 .card.active {
   border-color: var(--hover-border);
   box-shadow: 0 0 0 2px var(--hover-border);
+  /* Glow ring */
 }
 
+/* Card content container - ensures proper z-index above glow */
 .card-content {
   z-index: 2;
   display: flex;
@@ -123,11 +247,18 @@ body {
   justify-content: center;
 }
 
+/* ==========================================================================
+   ICON CONTAINER
+   ========================================================================== 
+   
+   Circular container for the system icon (table, laptop, car).
+*/
 .icon-container {
   background: #1a1a1a;
   width: 80px;
   height: 80px;
   border-radius: 20px;
+  /* Rounded square */
   display: flex;
   justify-content: center;
   align-items: center;
@@ -135,36 +266,50 @@ body {
   transition: transform var(--transition-speed) ease;
 }
 
+/* Icon inside container - Phosphor icon */
 .icon-container i {
   font-size: 3rem;
   color: var(--text-primary);
 }
 
+/* Icon container scales up on card hover */
 .card:hover .icon-container {
   transform: scale(1.1);
   background: #252525;
+  /* Slightly lighter on hover */
 }
 
+/* Card title */
 .card h2 {
   font-size: 1.5rem;
   font-weight: 600;
   margin-bottom: 0.5rem;
 }
 
+/* Card description */
 .card p {
   color: var(--text-secondary);
   font-size: 0.9rem;
   line-height: 1.5;
   max-width: 250px;
+  /* Limit line length */
 }
 
-/* Responsive */
+/* ==========================================================================
+   RESPONSIVE BREAKPOINTS
+   ========================================================================== 
+   
+   Adjust grid layout for smaller screens.
+*/
+
+/* Tablet - 2 column grid */
 @media (max-width: 900px) {
   .system-selection {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
+/* Mobile - single column */
 @media (max-width: 600px) {
   .system-selection {
     grid-template-columns: 1fr;
@@ -172,10 +317,18 @@ body {
 
   .brand-title {
     font-size: 3.5rem;
+    /* Smaller title on mobile */
   }
 }
 
-/* Animations */
+/* ==========================================================================
+   ANIMATIONS
+   ========================================================================== 
+   
+   CSS keyframe animations for entrance effects.
+*/
+
+/* Header fade-in animation - slides down from above */
 @keyframes fadeInDown {
   from {
     opacity: 0;

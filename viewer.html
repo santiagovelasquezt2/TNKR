@@ -1,44 +1,220 @@
+<!--
+================================================================================
+TNKR - Interactive 3D Component Explorer
+================================================================================
+FILE: viewer.html
+PURPOSE: 3D System Viewer page
+
+DESCRIPTION:
+This page displays the interactive 3D viewer for a selected system. Users arrive
+here after clicking a system card on the landing page. The URL contains a query
+parameter (?system=table) that specifies which system to load and display.
+
+The page layout consists of:
+- LEFT SIDEBAR: Navigation, system info, controls (expand/collapse, auto-rotate),
+                and component dropdowns (Learn, Components list with search)
+- MAIN CONTENT: The Three.js 3D canvas for rendering the model, plus a video
+                section below for related educational content
+
+KEY FEATURES:
+- Interactive 3D model viewing with orbit controls (rotate, zoom, pan)
+- Exploded view mode to see individual components separately
+- Component highlighting from sidebar or by clicking on 3D parts
+- Auto-rotation toggle for hands-free viewing
+- Searchable components dropdown for quick part lookup
+- Video section for related educational content
+
+DEPENDENCIES:
+- Google Fonts (Inter) for typography
+- Phosphor Icons for UI icons (arrows, carets, play button)
+- src/viewer.css for viewer-specific styling
+- src/viewer.js for initialization and UI logic
+- Three.js (loaded via viewer.js) for 3D rendering
+
+URL PARAMETERS:
+- system: The ID of the system to display (e.g., 'table', 'laptop', 'vehicle')
+
+AUTHOR: TNKR Development Team
+================================================================================
+-->
 <!DOCTYPE html>
 <html lang="en">
 
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TNKR - System Viewer</title>
-    <!-- Google Fonts: Inter -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link rel="stylesheet" href="./src/viewer.css">
+  <!-- Character encoding for proper text rendering -->
+  <meta charset="UTF-8" />
+
+  <!-- Responsive viewport configuration -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Page title (specific to viewer page) -->
+  <title>TNKR - System Viewer</title>
+
+  <!-- 
+      Google Fonts: Inter
+      Used for consistent typography across the application
+    -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+
+  <!-- 
+      Phosphor Icons
+      Used for UI elements like back arrow, dropdown carets, play button
+    -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Viewer page styles -->
+  <link rel="stylesheet" href="./src/viewer.css">
 </head>
 
 <body>
-    <div id="viewer-container">
-        <canvas id="three-canvas"></canvas>
+  <!-- 
+      ============================================================================
+      LEFT SIDEBAR
+      ============================================================================
+      Contains navigation, system information, viewer controls, and dropdowns.
+      Fixed width (350px) with frosted glass effect background.
+    -->
+  <aside id="sidebar">
+    <!-- 
+          Back Button
+          Returns user to the landing page (system selection)
+        -->
+    <a href="/" class="back-button">
+      <i class="ph ph-arrow-left"></i> Back to Systems
+    </a>
+
+    <!-- 
+          System Information Section
+          Displays the name and description of the currently loaded system.
+          Content is populated dynamically by viewer.js after loading system config.
+        -->
+    <div id="system-info">
+      <h1 class="system-title" id="sys-title">Loading...</h1>
+      <p class="system-desc" id="sys-desc">Please wait while the system model loads.</p>
     </div>
 
-    <aside id="sidebar">
-        <a href="/" class="back-button">
-            <i class="ph ph-arrow-left"></i> Back to Systems
-        </a>
+    <!-- 
+          View Mode Controls
+          Toggle between Assembled (collapsed) and Exploded views.
+          When clicked, animations move parts apart or back together.
+        -->
+    <div class="controls">
+      <!-- Assembled View Button - Shows parts in their normal positions -->
+      <button id="btn-collapse" class="action-btn active">Assembled</button>
+      <!-- Exploded View Button - Separates parts for individual viewing -->
+      <button id="btn-expand" class="action-btn">Exploded</button>
+    </div>
 
-        <div id="system-info">
-            <h1 class="system-title" id="sys-title">Loading...</h1>
-            <p class="system-desc" id="sys-desc">Please wait while the system model loads.</p>
-        </div>
+    <!-- 
+          Explosion Amount Slider
+          Allows fine-grained control over how far apart the parts are spread.
+          Value range: 0 (fully assembled) to 100 (fully exploded)
+        -->
+    <div class="slider-container">
+      <label for="explosion-slider">Explosion Amount</label>
+      <input type="range" id="explosion-slider" min="0" max="100" value="0">
+    </div>
 
-        <div class="controls">
-            <button id="btn-collapse" class="action-btn active">Combined</button>
-            <button id="btn-expand" class="action-btn">Exploded</button>
-        </div>
+    <!-- 
+          Auto Rotation Toggle Switch
+          When enabled, the 3D model automatically rotates for a better overview.
+          Rotation pauses when user interacts with parts.
+        -->
+    <label class="toggle-switch">
+      <input type="checkbox" id="btn-auto-rotate" checked>
+      <span class="toggle-slider"></span>
+      <span class="toggle-label">Auto Rotation</span>
+    </label>
 
-        <h3>Components</h3>
+    <!-- 
+          Learn Dropdown Section
+          Placeholder for future educational content about the system.
+          Will contain tutorials, guides, and other learning materials.
+        -->
+    <div class="dropdown-section">
+      <button class="dropdown-header" id="learn-dropdown-btn">
+        <span>Learn</span>
+        <i class="ph ph-caret-down"></i>
+      </button>
+      <div class="dropdown-content" id="learn-content">
+        <p class="dropdown-placeholder">Learning content coming soon...</p>
+      </div>
+    </div>
+
+    <!-- 
+          Components Dropdown Section
+          Contains a searchable list of all parts/components in the model.
+          Users can search and click to highlight specific parts in the 3D view.
+        -->
+    <div class="dropdown-section">
+      <button class="dropdown-header" id="components-dropdown-btn">
+        <span>Components</span>
+        <i class="ph ph-caret-down"></i>
+      </button>
+      <div class="dropdown-content" id="components-content">
+        <!-- Search input for filtering components by name -->
+        <input type="text" id="parts-search" placeholder="Search components..." class="search-input">
+        <!-- 
+                  Parts List Container
+                  Dynamically populated by viewer.js with grouped component items.
+                  Similar parts (e.g., Leg 1-4) are grouped together.
+                -->
         <div class="parts-list" id="parts-list">
-            <!-- Generated by JS -->
+          <!-- Generated by JS -->
         </div>
-    </aside>
+      </div>
+    </div>
 
-    <script type="module" src="/src/viewer.js"></script>
+    <!-- 
+          How to TNKR Button
+          Scrolls to the video section showing educational content about tinkering.
+          Only functional when videos are available for the current system.
+        -->
+    <button class="dropdown-header how-to-tnkr-btn" id="how-to-tnkr-btn">
+      <span>How to TNKR</span>
+      <i class="ph ph-arrow-down"></i>
+    </button>
+  </aside>
+
+  <!-- 
+      ============================================================================
+      MAIN CONTENT AREA
+      ============================================================================
+      Contains the 3D viewer canvas and optional video section.
+      Scrollable to allow viewing video content below the 3D model.
+    -->
+  <main id="main-content">
+    <!-- 
+          3D Viewer Container
+          Holds the Three.js canvas that renders the 3D model.
+          Takes full viewport height for an immersive viewing experience.
+        -->
+    <div id="viewer-container">
+      <!-- 
+              Three.js Canvas
+              The actual WebGL canvas where the 3D scene is rendered.
+              Controlled by SystemViewer.js class.
+            -->
+      <canvas id="three-canvas"></canvas>
+    </div>
+
+    <!-- 
+          Video Section
+          Displays related educational videos about the system.
+          Hidden by default if no videos are configured for the system.
+          Content is rendered by VideoSection.js component.
+        -->
+    <section id="video-section" style="display: none;">
+      <!-- Rendered by VideoSection.js -->
+    </section>
+  </main>
+
+  <!-- 
+      Viewer JavaScript Module
+      Main entry point that initializes the viewer, loads the model,
+      sets up controls, and handles user interactions.
+    -->
+  <script type="module" src="/src/viewer.js"></script>
 </body>
 
 </html>

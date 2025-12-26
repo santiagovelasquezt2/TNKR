@@ -1,60 +1,145 @@
+<!--
+================================================================================
+TNKR - Interactive 3D Component Explorer
+================================================================================
+FILE: index.html
+PURPOSE: Landing page for the TNKR application
+
+DESCRIPTION:
+This is the main entry point and landing page for the TNKR (Tinker) application.
+TNKR is an interactive 3D component explorer that allows users to visualize and 
+understand real-world systems by viewing their 3D models, exploring individual 
+components, and learning how they fit together.
+
+This landing page displays a selection of available systems (Table, Laptop, 
+Electric Vehicle) as interactive cards. When a user clicks on a system card,
+they are navigated to the viewer page where they can interact with the 3D model.
+
+DEPENDENCIES:
+- Google Fonts (Inter font family) for modern typography
+- Phosphor Icons for card icons
+- src/style.css for landing page styling
+- src/main.js for card animations and navigation logic
+
+AUTHOR: TNKR Development Team
+================================================================================
+-->
 <!DOCTYPE html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>TNKR - Interactive 3D Component Explorer</title>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    <link rel="stylesheet" href="./src/style.css">
-  </head>
-  <body>
-    <div id="app">
-      <header class="landing-header">
-        <h1 class="brand-title">TNKR</h1>
-        <p class="brand-subtitle">Visualizing and understanding real world systems in 3D</p>
-      </header>
-      
-      <main class="system-selection">
-        <div class="card" data-system="table">
-          <div class="card-content">
-            <div class="icon-container">
-              <i class="ph ph-table"></i>
-            </div>
-            <h2>Table</h2>
-            <p>Explore dining and workspace furniture systems</p>
-          </div>
-          <div class="card-glow"></div>
-        </div>
 
-        <div class="card" data-system="laptop">
-          <div class="card-content">
-            <div class="icon-container">
-              <i class="ph ph-laptop"></i>
-            </div>
-            <h2>Laptop</h2>
-            <p>Understand computing device architecture</p>
-          </div>
-          <div class="card-glow"></div>
-        </div>
+<head>
+  <!-- Character encoding for proper text rendering -->
+  <meta charset="UTF-8" />
 
-        <div class="card" data-system="vehicle">
-          <div class="card-content">
-            <div class="icon-container">
-              <i class="ph ph-car-profile"></i>
-            </div>
-            <h2>Electric Vehicle</h2>
-            <p>Visualize sustainable transportation systems</p>
+  <!-- Favicon using Vite's default SVG icon -->
+  <link rel="icon" type="image/svg+xml" href="/vite.svg" />
+
+  <!-- Responsive viewport configuration for mobile devices -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+  <!-- Page title shown in browser tab -->
+  <title>TNKR - Interactive 3D Component Explorer</title>
+
+  <!-- 
+      Google Fonts: Inter
+      Inter is used throughout the app for a clean, modern look.
+      Weights: 400 (regular), 500 (medium), 600 (semi-bold), 700 (bold), 800 (extra-bold)
+    -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- 
+      Phosphor Icons
+      A flexible icon library used for system card icons (table, laptop, car)
+    -->
+  <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
+  <!-- Landing page styles -->
+  <link rel="stylesheet" href="./src/style.css">
+</head>
+
+<body>
+  <!-- 
+      Main application container
+      Contains the header and system selection cards
+    -->
+  <div id="app">
+    <!-- 
+        Landing Header Section
+        Displays the brand name and tagline
+      -->
+    <header class="landing-header">
+      <!-- Main brand title with gradient effect -->
+      <h1 class="brand-title">TNKR</h1>
+      <!-- Tagline explaining the app's purpose -->
+      <p class="brand-subtitle">Visualizing and understanding real world systems in 3D</p>
+    </header>
+
+    <!-- 
+        System Selection Grid
+        Contains clickable cards for each available 3D system.
+        Each card has a data-system attribute that identifies which system to load.
+      -->
+    <main class="system-selection">
+      <!-- 
+          Table System Card
+          Represents furniture systems like dining tables and workspaces
+        -->
+      <div class="card" data-system="table">
+        <div class="card-content">
+          <div class="icon-container">
+            <!-- Phosphor table icon -->
+            <i class="ph ph-table"></i>
           </div>
-          <div class="card-glow"></div>
+          <h2>Table</h2>
+          <p>Explore dining and workspace furniture systems</p>
         </div>
-      </main>
-    </div>
-    <script type="module" src="/src/main.js"></script>
-  </body>
+        <!-- Glow effect element for hover interactions -->
+        <div class="card-glow"></div>
+      </div>
+
+      <!-- 
+          Laptop System Card
+          Represents computing device architecture (placeholder - no model yet)
+        -->
+      <div class="card" data-system="laptop">
+        <div class="card-content">
+          <div class="icon-container">
+            <!-- Phosphor laptop icon -->
+            <i class="ph ph-laptop"></i>
+          </div>
+          <h2>Laptop</h2>
+          <p>Understand computing device architecture</p>
+        </div>
+        <!-- Glow effect element for hover interactions -->
+        <div class="card-glow"></div>
+      </div>
+
+      <!-- 
+          Electric Vehicle System Card
+          Represents sustainable transportation systems (placeholder - no model yet)
+        -->
+      <div class="card" data-system="vehicle">
+        <div class="card-content">
+          <div class="icon-container">
+            <!-- Phosphor car profile icon -->
+            <i class="ph ph-car-profile"></i>
+          </div>
+          <h2>Electric Vehicle</h2>
+          <p>Visualize sustainable transportation systems</p>
+        </div>
+        <!-- Glow effect element for hover interactions -->
+        <div class="card-glow"></div>
+      </div>
+    </main>
+  </div>
+
+  <!-- 
+      Main JavaScript Module
+      Handles card animations with GSAP and click navigation to viewer page
+    -->
+  <script type="module" src="/src/main.js"></script>
+</body>
+
 </html>

@@ -1,22 +1,85 @@
-/* Inherit base vars from style.css manually or import if using a preprocessor (but we are vanilla CSS) */
-/* We'll just redefine core vars or rely on main style.css if imported. 
-   But viewer.html will link valid CSS. Let's create a dedicated css file that imports style.css or just shares logic.
-   Actually easier to just have specific viewer styles here.
-*/
+/**
+ * ================================================================================
+ * TNKR - Interactive 3D Component Explorer
+ * ================================================================================
+ * FILE: src/viewer.css
+ * PURPOSE: 3D Viewer page styles
+ * 
+ * DESCRIPTION:
+ * This stylesheet defines the visual appearance of the TNKR viewer page
+ * (viewer.html). It styles the sidebar controls, 3D viewer container,
+ * video section, and all interactive UI elements.
+ * 
+ * PAGE LAYOUT:
+ * - Sidebar (350px fixed width, left side) - Contains all controls and info
+ * - Main Content (flexible, right side) - Contains 3D canvas and video section
+ * 
+ * DESIGN PHILOSOPHY:
+ * - Dark theme consistent with landing page
+ * - Frosted glass effect on sidebar for depth
+ * - Subtle UI elements that don't distract from 3D content
+ * - Smooth transitions and hover effects
+ * - Custom styled form controls (range slider, toggle switch)
+ * 
+ * KEY COMPONENTS:
+ * - Sidebar with blur effect
+ * - Back button for navigation
+ * - Action buttons (Assembled/Exploded)
+ * - Range slider for explosion amount
+ * - Toggle switch for auto-rotation
+ * - Dropdown accordions (Learn, Components)
+ * - Searchable parts list
+ * - Video grid section
+ * - Floating part labels in 3D view
+ * 
+ * DEPENDENCIES:
+ * - Google Fonts: Inter (loaded in viewer.html)
+ * - Works with SystemViewer.js for 3D canvas
+ * - Works with VideoSection.js for video grid
+ * 
+ * AUTHOR: TNKR Development Team
+ * ================================================================================
+ */
 
+/* ==========================================================================
+   CSS CUSTOM PROPERTIES (VARIABLES)
+   ========================================================================== 
+   
+   Core design tokens specific to the viewer page.
+   Some overlap with style.css but defined separately to avoid dependency.
+*/
 :root {
+    /* Fixed width for the sidebar */
     --sidebar-width: 350px;
+
+    /* Background color - pure black */
     --bg-color: #000000;
+
+    /* Primary text color - white */
     --text-primary: #ffffff;
+
+    /* Secondary text color - medium gray */
     --text-secondary: #888888;
+
+    /* Accent color for active/focus states (blue) */
     --accent-color: #4444ff;
+
+    /* Border color for UI elements */
     --border-color: #222222;
 }
 
+/* ==========================================================================
+   BASE LAYOUT
+   ========================================================================== 
+   
+   Page-level layout using flexbox with sidebar + main content.
+*/
+
+/* Body fills viewport, flex layout for sidebar + content */
 body {
     margin: 0;
     overflow: hidden;
-    /* No scroll on viewer page */
+    /* No scroll on body - scroll only in main content */
     background: var(--bg-color);
     color: var(--text-primary);
     font-family: 'Inter', sans-serif;
@@ -24,30 +87,163 @@ body {
     height: 100vh;
 }
 
-#viewer-container {
+/* Main content area - flexible width, scrollable */
+#main-content {
     flex-grow: 1;
-    position: relative;
+    /* Takes remaining space after sidebar */
     height: 100%;
+    overflow-y: auto;
+    /* Allows scrolling to video section */
+    position: relative;
+    scroll-behavior: smooth;
+    /* Smooth scrolling when navigating */
 }
 
+/* 3D Viewer container - full viewport height */
+#viewer-container {
+    width: 100%;
+    height: 100vh;
+    /* Full viewport height for immersive viewing */
+    position: relative;
+}
+
+/* Three.js canvas - fills container completely */
 canvas {
     width: 100%;
     height: 100%;
     outline: none;
+    /* Remove focus outline */
+    display: block;
+    /* Remove inline spacing */
 }
 
+/* ==========================================================================
+   SIDEBAR
+   ========================================================================== 
+   
+   Fixed-width sidebar with frosted glass effect.
+   Contains all viewer controls and system information.
+*/
 #sidebar {
     width: var(--sidebar-width);
     height: 100%;
     background: rgba(10, 10, 10, 0.95);
-    border-left: 1px solid var(--border-color);
+    border-right: 1px solid var(--border-color);
     display: flex;
     flex-direction: column;
     padding: 1.5rem;
     z-index: 10;
+    /* Above 3D content */
     backdrop-filter: blur(10px);
+    /* Frosted glass effect */
+    flex-shrink: 0;
+    /* Don't shrink when space is tight */
 }
 
+/* ==========================================================================
+   VIDEO SECTION
+   ========================================================================== 
+   
+   Grid layout for educational video cards below the 3D viewer.
+   Appears when scrolling down past the viewer.
+*/
+#video-section {
+    padding: 4rem 6rem;
+    background: #000000;
+    min-height: 50vh;
+}
+
+/* Section title for videos */
+.video-section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    margin-bottom: 3rem;
+    color: white;
+}
+
+/* Video cards grid - 3 columns on desktop */
+.video-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+}
+
+/* Individual video card - clickable link */
+.video-card {
+    display: block;
+    text-decoration: none;
+    color: white;
+    transition: transform 0.2s;
+}
+
+/* Video card hover - lifts up slightly */
+.video-card:hover {
+    transform: translateY(-5px);
+}
+
+/* Thumbnail container with aspect ratio */
+.video-thumbnail {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16/9;
+    /* Standard video ratio */
+    background: #1a1a1a;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+
+/* Thumbnail image - fills container */
+.video-thumbnail img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.2s;
+}
+
+/* Thumbnail dims on hover */
+.video-card:hover .video-thumbnail img {
+    opacity: 0.8;
+}
+
+/* Play button overlay - centered on thumbnail */
+.play-overlay {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 3rem;
+    opacity: 0;
+    /* Hidden by default */
+    transition: opacity 0.2s;
+    color: white;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+}
+
+/* Play button appears on hover */
+.video-card:hover .play-overlay {
+    opacity: 1;
+}
+
+/* Video title below thumbnail */
+.video-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+    line-height: 1.4;
+    text-align: center;
+}
+
+/* ==========================================================================
+   SIDEBAR COMPONENTS
+   ========================================================================== 
+   
+   Individual UI elements within the sidebar.
+*/
+
+/* Back button - returns to landing page */
 .back-button {
     background: transparent;
     border: 1px solid var(--border-color);
@@ -63,19 +259,23 @@ canvas {
     margin-bottom: 2rem;
     transition: all 0.2s;
     text-decoration: none;
+    /* Remove link underline */
 }
 
+/* Back button hover - becomes more prominent */
 .back-button:hover {
     border-color: var(--text-primary);
     color: var(--text-primary);
 }
 
+/* System title in sidebar */
 .system-title {
     font-size: 2rem;
     font-weight: 700;
     margin-bottom: 0.5rem;
 }
 
+/* System description in sidebar */
 .system-desc {
     color: var(--text-secondary);
     font-size: 1rem;
@@ -83,14 +283,24 @@ canvas {
     line-height: 1.5;
 }
 
+/* ==========================================================================
+   ACTION BUTTONS (Assembled/Exploded)
+   ========================================================================== 
+   
+   Toggle buttons for switching between view modes.
+*/
+
+/* Button container - flexbox with equal width buttons */
 .controls {
     display: flex;
     gap: 1rem;
     margin-bottom: 2rem;
 }
 
+/* Individual action button */
 .action-btn {
     flex: 1;
+    /* Equal width */
     padding: 12px;
     border-radius: 8px;
     border: 1px solid var(--border-color);
@@ -101,16 +311,265 @@ canvas {
     transition: all 0.2s;
 }
 
+/* Button hover state */
 .action-btn:hover {
     background: #252525;
     border-color: var(--text-primary);
 }
 
+/* Active/selected button - blue background */
 .action-btn.active {
     background: var(--accent-color);
     border-color: var(--accent-color);
 }
 
+/* ==========================================================================
+   EXPLOSION SLIDER
+   ========================================================================== 
+   
+   Range slider for controlling explosion amount (0-100%).
+   Custom styled to match dark theme with yellow thumb.
+*/
+
+/* Slider container */
+.slider-container {
+    margin-bottom: 1.5rem;
+}
+
+/* Slider label */
+.slider-container label {
+    display: block;
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    margin-bottom: 0.5rem;
+}
+
+/* Custom range slider - track */
+.slider-container input[type="range"] {
+    width: 100%;
+    height: 6px;
+    border-radius: 3px;
+    background: #333;
+    outline: none;
+    appearance: none;
+    -webkit-appearance: none;
+    cursor: pointer;
+}
+
+/* Slider thumb (WebKit browsers - Chrome, Safari) */
+.slider-container input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffcc00;
+    /* Yellow - matches highlight color */
+    cursor: pointer;
+    border: 2px solid #222;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+}
+
+/* Slider thumb (Firefox) */
+.slider-container input[type="range"]::-moz-range-thumb {
+    width: 18px;
+    height: 18px;
+    border-radius: 50%;
+    background: #ffcc00;
+    cursor: pointer;
+    border: 2px solid #222;
+}
+
+/* ==========================================================================
+   AUTO ROTATION TOGGLE SWITCH
+   ========================================================================== 
+   
+   Custom toggle switch for enabling/disabling auto-rotation.
+   iOS-style switch with smooth animation.
+*/
+
+/* Toggle container - acts as label */
+.toggle-switch {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 1.5rem;
+    cursor: pointer;
+    user-select: none;
+    /* Prevent text selection on click */
+}
+
+/* Hide the actual checkbox */
+.toggle-switch input {
+    display: none;
+}
+
+/* Switch track (background) */
+.toggle-slider {
+    width: 36px;
+    height: 20px;
+    background: #333;
+    border-radius: 10px;
+    position: relative;
+    transition: background 0.2s;
+}
+
+/* Switch thumb (circular button) */
+.toggle-slider::after {
+    content: '';
+    position: absolute;
+    width: 16px;
+    height: 16px;
+    background: #888;
+    border-radius: 50%;
+    top: 2px;
+    left: 2px;
+    transition: all 0.2s;
+}
+
+/* Checked state - track turns blue */
+.toggle-switch input:checked+.toggle-slider {
+    background: #4444ff;
+}
+
+/* Checked state - thumb moves right and turns white */
+.toggle-switch input:checked+.toggle-slider::after {
+    left: 18px;
+    background: white;
+}
+
+/* Toggle label text */
+.toggle-label {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   DROPDOWN SECTIONS (Learn, Components)
+   ========================================================================== 
+   
+   Accordion-style dropdowns for organizing sidebar content.
+*/
+
+/* Dropdown container */
+.dropdown-section {
+    margin-bottom: 0.5rem;
+}
+
+/* Dropdown header button - click to expand/collapse */
+.dropdown-header {
+    width: 100%;
+    padding: 12px 16px;
+    background: #1a1a1a;
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: all 0.2s;
+}
+
+/* Dropdown header hover */
+.dropdown-header:hover {
+    background: #252525;
+    border-color: var(--text-primary);
+}
+
+/* Open state - rounded only on top */
+.dropdown-header.open {
+    border-radius: 8px 8px 0 0;
+    border-bottom-color: transparent;
+}
+
+/* Caret icon rotates when open */
+.dropdown-header i {
+    transition: transform 0.2s;
+}
+
+.dropdown-header.open i {
+    transform: rotate(180deg);
+}
+
+/* Dropdown content container - hidden by default */
+.dropdown-content {
+    display: none;
+    background: rgba(26, 26, 26, 0.8);
+    border: 1px solid var(--border-color);
+    border-top: none;
+    border-radius: 0 0 8px 8px;
+    padding: 12px;
+    max-height: 250px;
+    overflow-y: auto;
+    /* Scrollable if many items */
+}
+
+/* Open state - shows content */
+.dropdown-content.open {
+    display: block;
+}
+
+/* Placeholder text in empty dropdowns */
+.dropdown-placeholder {
+    color: var(--text-secondary);
+    font-size: 0.85rem;
+    text-align: center;
+    padding: 1rem;
+}
+
+/* ==========================================================================
+   HOW TO TNKR BUTTON
+   ========================================================================== 
+   
+   Special navigation button that scrolls to the video section.
+*/
+.how-to-tnkr-btn {
+    margin-top: 1rem;
+}
+
+.how-to-tnkr-btn:hover {
+    background: rgba(68, 68, 255, 0.3);
+    border-color: var(--accent-color);
+}
+
+/* ==========================================================================
+   SEARCH INPUT
+   ========================================================================== 
+   
+   Text input for searching/filtering the components list.
+*/
+.search-input {
+    width: 100%;
+    padding: 10px 12px;
+    background: #0a0a0a;
+    border: 1px solid var(--border-color);
+    border-radius: 6px;
+    color: white;
+    font-size: 0.9rem;
+    margin-bottom: 0.75rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+/* Placeholder text styling */
+.search-input::placeholder {
+    color: var(--text-secondary);
+}
+
+/* Focus state - blue border */
+.search-input:focus {
+    border-color: var(--accent-color);
+}
+
+/* ==========================================================================
+   PARTS LIST
+   ========================================================================== 
+   
+   Scrollable list of clickable part/component items.
+*/
+
+/* Parts list container */
 .parts-list {
     flex-grow: 1;
     overflow-y: auto;
@@ -119,6 +578,7 @@ canvas {
     gap: 0.5rem;
 }
 
+/* Individual part item - clickable */
 .part-item {
     padding: 12px;
     border-radius: 8px;
@@ -130,26 +590,35 @@ canvas {
     align-items: center;
 }
 
+/* Part item hover */
 .part-item:hover {
     background: rgba(255, 255, 255, 0.05);
 }
 
+/* Selected part item - yellow highlight */
 .part-item.selected {
-    background: rgba(68, 68, 255, 0.2);
-    border: 1px solid var(--accent-color);
+    background: rgba(255, 204, 0, 0.2);
+    border: 1px solid #ffcc00;
 }
 
+/* Part name text */
 .part-name {
     font-weight: 500;
 }
 
+/* Part info section (unused but reserved) */
 .part-info {
     margin-top: auto;
     padding-top: 1rem;
     border-top: 1px solid var(--border-color);
 }
 
-/* Scrollbar styling */
+/* ==========================================================================
+   CUSTOM SCROLLBAR (Parts List)
+   ========================================================================== 
+   
+   Thin, subtle scrollbar for the parts list.
+*/
 .parts-list::-webkit-scrollbar {
     width: 6px;
 }
@@ -161,4 +630,44 @@ canvas {
 .parts-list::-webkit-scrollbar-thumb {
     background: #333;
     border-radius: 3px;
+}
+
+/* ==========================================================================
+   3D VIEWER PART LABELS
+   ========================================================================== 
+   
+   Floating labels that appear above highlighted parts in the 3D view.
+   Positioned absolutely and updated by JavaScript each frame.
+*/
+
+/* Part label bubble */
+.part-label {
+    position: absolute;
+    background: #666666;
+    color: white;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    pointer-events: none;
+    /* Don't interfere with 3D interaction */
+    white-space: nowrap;
+    z-index: 100;
+    transform: translate(-50%, -100%);
+    /* Center above the point */
+    margin-top: -10px;
+    /* Add space above the part */
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+}
+
+/* Triangle pointer below the label (points down at the part) */
+.part-label::after {
+    content: '';
+    position: absolute;
+    bottom: -6px;
+    left: 50%;
+    transform: translateX(-50%);
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid #666666;
 }

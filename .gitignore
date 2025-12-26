@@ -1,4 +1,27 @@
-# Logs
+# ==============================================================================
+# TNKR - Interactive 3D Component Explorer
+# ==============================================================================
+# FILE: .gitignore
+# PURPOSE: Git ignore patterns
+#
+# DESCRIPTION:
+# This file specifies which files and directories Git should ignore when
+# tracking changes. Ignored items are typically generated files, dependencies,
+# or system-specific files that should not be committed to the repository.
+#
+# CATEGORIES:
+# 1. Log files - Debug and error logs from various package managers
+# 2. Dependencies - The node_modules folder (reinstalled via npm install)
+# 3. Build output - Generated distribution files (rebuilt via npm run build)
+# 4. Editor config - IDE-specific settings and files
+# 5. OS files - System-generated files like .DS_Store on Mac
+# ==============================================================================
+
+# ==============================================================================
+# LOG FILES
+# Debug and error logs from npm, yarn, pnpm, and lerna
+# These are generated during package operations and not needed in source control
+# ==============================================================================
 logs
 *.log
 npm-debug.log*
@@ -7,16 +30,46 @@ yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
 
+# ==============================================================================
+# DEPENDENCIES
+# The node_modules directory contains all npm packages
+# It's regenerated from package-lock.json via 'npm install'
+# ==============================================================================
 node_modules
+
+# ==============================================================================
+# BUILD OUTPUT
+# Generated files from 'npm run build'
+# These are production-ready files and can be rebuilt from source
+# ==============================================================================
 dist
 dist-ssr
+
+# ==============================================================================
+# LOCAL ENVIRONMENT FILES
+# Local configuration files that may contain machine-specific settings
+# ==============================================================================
 *.local
 
-# Editor directories and files
+# ==============================================================================
+# EDITOR/IDE FILES
+# Editor-specific configuration and cache files
+# Note: .vscode/extensions.json is kept for recommended extensions
+# ==============================================================================
 .vscode/*
 !.vscode/extensions.json
 .idea
+
+# ==============================================================================
+# OS-SPECIFIC FILES
+# System-generated files that are OS-specific
+# ==============================================================================
 .DS_Store
+
+# ==============================================================================
+# VISUAL STUDIO FILES
+# Windows Visual Studio project and solution files
+# ==============================================================================
 *.suo
 *.ntvs*
 *.njsproj

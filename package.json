@@ -1,17 +1,22 @@
 {
+  "_comment": "TNKR - Interactive 3D Component Explorer - NPM Package Configuration",
+  "_description": "This file defines the project metadata, scripts, and dependencies for the TNKR application.",
   "name": "tnkr-app",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
+    "_comment_scripts": "Commands for development, building, and previewing the application",
     "dev": "vite",
     "build": "vite build",
     "preview": "vite preview"
   },
   "devDependencies": {
+    "_comment_devDeps": "Development-only dependencies (build tools)",
     "vite": "^7.2.4"
   },
   "dependencies": {
+    "_comment_deps": "Runtime dependencies used in the application",
     "gsap": "^3.14.2",
     "three": "^0.182.0"
   }
