@@ -61,6 +61,23 @@ let allGroups = new Map()
  */
 let currentViewer = null
 
+// ============================================================================
+// CONSTANTS
+// ============================================================================
+
+/** Debounce delay for search input in milliseconds */
+const SEARCH_DEBOUNCE_MS = 150
+
+// ============================================================================
+// CACHED DOM REFERENCES (set during initialization)
+// ============================================================================
+
+/** @type {HTMLElement|null} */
+let partsListContainer = null
+
+/** @type {number|null} Search debounce timer ID */
+let searchDebounceTimer = null
+
 /**
  * Main initialization - runs when DOM is fully loaded.
  * Sets up the entire viewer page including 3D canvas, UI controls, and event handlers.
@@ -210,12 +227,21 @@ document.addEventListener('DOMContentLoaded', async () => {
     // =========================================================================
     /**
      * Component Search Input Handler
-     * Filters the parts list as user types
+     * Uses debouncing to avoid excessive filtering while typing
      */
     const searchInput = document.getElementById('parts-search')
     searchInput.addEventListener('input', (e) => {
         const query = e.target.value.toLowerCase().trim()
-        filterAndRenderParts(viewer, query)
+
+        // Clear previous debounce timer
+        if (searchDebounceTimer) {
+            clearTimeout(searchDebounceTimer)
+        }
+
+        // Debounce search to avoid filtering on every keystroke
+        searchDebounceTimer = setTimeout(() => {
+            filterAndRenderParts(viewer, query)
+        }, SEARCH_DEBOUNCE_MS)
     })
 
     // =========================================================================
@@ -232,6 +258,24 @@ document.addEventListener('DOMContentLoaded', async () => {
             videoSection.scrollIntoView({ behavior: 'smooth', block: 'start' })
         }
     })
+
+    // =========================================================================
+    // 10. BACK UP BUTTON (SCROLL BACK TO 3D VIEWER)
+    // =========================================================================
+    /**
+     * Back Up Button Handler
+     * Smooth scrolls back to the 3D viewer at the top of the page.
+     * The button is rendered by VideoSection.js when videos are present.
+     */
+    const backUpBtn = document.getElementById('back-up-btn')
+    if (backUpBtn) {
+        backUpBtn.addEventListener('click', () => {
+            const viewerContainer = document.getElementById('viewer-container')
+            if (viewerContainer) {
+                viewerContainer.scrollIntoView({ behavior: 'smooth', block: 'start' })
+            }
+        })
+    }
 })
 
 /**
@@ -402,14 +446,22 @@ function filterAndRenderParts(viewer, query) {
  * @param {Map<string, {displayName: string, ids: string[], description: string}>} groups - Part groups to display
  */
 function renderFilteredPartsList(viewer, groups) {
-    const container = document.getElementById('parts-list')
-    container.innerHTML = ''
+    // Use cached container reference, or get it once
+    if (!partsListContainer) {
+        partsListContainer = document.getElementById('parts-list')
+    }
+
+    // Clear existing content
+    partsListContainer.innerHTML = ''
 
     // Show placeholder if no parts found
     if (groups.size === 0) {
-        container.innerHTML = '<p class="dropdown-placeholder">No components found</p>'
+        partsListContainer.innerHTML = '<p class="dropdown-placeholder">No components found</p>'
         return
     }
+
+    // Use DocumentFragment for batch DOM insertion (better performance)
+    const fragment = document.createDocumentFragment()
 
     // Create a list item for each group
     groups.forEach((group, key) => {
@@ -444,6 +496,9 @@ function renderFilteredPartsList(viewer, groups) {
             }
         })
 
-        container.appendChild(el)
+        fragment.appendChild(el)
     })
+
+    // Single DOM operation to add all items
+    partsListContainer.appendChild(fragment)
 }

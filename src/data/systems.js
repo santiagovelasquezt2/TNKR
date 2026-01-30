@@ -129,10 +129,6 @@ export const systems = {
             'Table_Short_Apron_1': { y: -1, z: 0.5 }, // Back side
             'Table_Short_Apron_2': { y: 1, z: 0.5 },  // Front side
 
-            // Note: There's a duplicate entry for short aprons above (legacy)
-            'Table_Short_Apron_1': { y: -1, z: 0.5 },
-            'Table_Short_Apron_2': { y: 1, z: 0.5 },
-
             // Protective felt moves down to separate from table top
             'Table_Fabric_Towel_0': { z: -1 }
         },

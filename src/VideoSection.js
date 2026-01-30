@@ -95,5 +95,9 @@ export function renderVideoSection(containerId, videos) {
                 </a>
             `).join('')}
         </div>
+        <button class="back-up-btn" id="back-up-btn">
+            <i class="ph ph-arrow-up"></i>
+            <span>Back Up</span>
+        </button>
     `
 }

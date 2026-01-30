@@ -34,15 +34,18 @@ import './style.css'
 // GSAP: Professional animation library for smooth UI transitions
 import gsap from 'gsap'
 
-// Three.js: 3D rendering library (imported here to log version for debugging)
-import * as THREE from 'three'
+// ============================================================================
+// ANIMATION CONSTANTS
+// ============================================================================
 
-/**
- * Debug logging to verify dependencies are loaded correctly.
- * Useful for troubleshooting build or import issues.
- */
-console.log('Three.js version:', THREE.REVISION)
-console.log('GSAP loaded')
+/** Duration of card entrance animation in seconds */
+const CARD_ANIMATION_DURATION = 0.8
+
+/** Delay between each card's animation start */
+const CARD_STAGGER_DELAY = 0.2
+
+/** Initial delay before animations begin (lets page settle) */
+const ANIMATION_INITIAL_DELAY = 0.4
 
 /**
  * Initialize the landing page.
@@ -56,28 +59,20 @@ console.log('GSAP loaded')
 const init = () => {
   // Get all system selection cards from the DOM
   const cards = document.querySelectorAll('.card')
-  console.log('Found cards:', cards.length)
 
   /**
    * Animate cards on load with a staggered fade-in effect.
-   * 
-   * Animation details:
-   * - Duration: 0.8 seconds per card
-   * - Effect: Cards slide up from 50px below while fading in
-   * - Stagger: 0.2 second delay between each card
-   * - Easing: power3.out for natural deceleration
-   * - Initial delay: 0.4 seconds to let page settle
+   * Cards slide up from 50px below while fading in.
    */
   gsap.to('.card', {
-    duration: 0.8,           // Animation duration in seconds
-    y: 0,                    // Final Y position (slides up to natural position)
-    opacity: 1,              // Final opacity (fully visible)
-    stagger: 0.2,            // Delay between each card's animation start
-    ease: 'power3.out',      // Easing function for natural motion
-    delay: 0.4,              // Initial delay before animation starts
+    duration: CARD_ANIMATION_DURATION,
+    y: 0,
+    opacity: 1,
+    stagger: CARD_STAGGER_DELAY,
+    ease: 'power3.out',
+    delay: ANIMATION_INITIAL_DELAY,
     onComplete: () => {
       // Add visible class as fallback for CSS transitions
-      // This ensures cards remain visible if GSAP somehow fails
       cards.forEach(card => card.classList.add('visible'))
     }
   })

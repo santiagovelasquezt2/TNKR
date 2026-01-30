@@ -51,6 +51,52 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js'
 // GSAP - professional animation library for smooth transitions
 import gsap from 'gsap'
 
+// ============================================================================
+// CONSTANTS - Extracted for maintainability and performance
+// ============================================================================
+
+/** Background color for the 3D scene (dark theme) */
+const SCENE_BACKGROUND_COLOR = 0x0a0a0a
+
+/** Highlight color for selected parts (yellow glow) */
+const HIGHLIGHT_COLOR = 0xffcc00
+
+/** Intensity of the emissive highlight effect */
+const HIGHLIGHT_INTENSITY = 0.15
+
+/** Camera field of view in degrees */
+const CAMERA_FOV = 45
+
+/** Near clipping plane distance */
+const CAMERA_NEAR = 0.1
+
+/** Far clipping plane distance */
+const CAMERA_FAR = 1000
+
+/** Maximum pixel ratio for renderer (limits retina overhead) */
+const MAX_PIXEL_RATIO = 2
+
+/** Damping factor for orbit controls */
+const CONTROLS_DAMPING = 0.05
+
+/** Auto-rotation speed in degrees per second */
+const AUTO_ROTATE_SPEED = 1.0
+
+/** Animation duration for expand/collapse in seconds */
+const ANIMATION_DURATION = 1
+
+/** Camera zoom multiplier (closer = smaller value) */
+const CAMERA_ZOOM_FACTOR = 0.6
+
+/** Ambient light intensity */
+const AMBIENT_LIGHT_INTENSITY = 0.6
+
+/** Main directional light intensity */
+const MAIN_LIGHT_INTENSITY = 1
+
+/** Back/rim light intensity */
+const BACK_LIGHT_INTENSITY = 0.5
+
 /**
  * SystemViewer Class
  * 
@@ -132,6 +178,24 @@ export class SystemViewer {
         /** @type {boolean} User's preference for auto-rotation (global toggle) */
         this.autoRotateEnabled = true
 
+        // =====================================================================
+        // REUSABLE OBJECTS - Prevents garbage collection pressure in render loop
+        // =====================================================================
+        /** @type {THREE.Box3} Reusable bounding box for label positioning */
+        this._tempBox = new THREE.Box3()
+
+        /** @type {THREE.Vector3} Reusable vector for center calculations */
+        this._tempCenter = new THREE.Vector3()
+
+        /** @type {THREE.Vector3} Reusable vector for screen projection */
+        this._tempScreenPos = new THREE.Vector3()
+
+        /** @type {HTMLElement|null} Cached reference to viewer container */
+        this._viewerContainer = null
+
+        // Bind animate method once (avoids creating new function each frame)
+        this._boundAnimate = this.animate.bind(this)
+
         // Initialize the 3D scene
         this.init()
     }
@@ -158,22 +222,22 @@ export class SystemViewer {
         this.scene = new THREE.Scene()
 
         // Set background color to match app's dark theme
-        this.scene.background = new THREE.Color(0x0a0a0a)
+        this.scene.background = new THREE.Color(SCENE_BACKGROUND_COLOR)
 
         // =====================================================================
         // LIGHTING SETUP (Three-Point Lighting)
         // =====================================================================
         // Ambient light: Provides base illumination, softens shadows
-        const ambientLight = new THREE.AmbientLight(0xffffff, 0.6)
+        const ambientLight = new THREE.AmbientLight(0xffffff, AMBIENT_LIGHT_INTENSITY)
         this.scene.add(ambientLight)
 
         // Main (key) light: Primary light source from front-right-top
-        const dirLight = new THREE.DirectionalLight(0xffffff, 1)
+        const dirLight = new THREE.DirectionalLight(0xffffff, MAIN_LIGHT_INTENSITY)
         dirLight.position.set(5, 10, 7)
         this.scene.add(dirLight)
 
         // Back (rim) light: Creates edge highlights from behind
-        const backLight = new THREE.DirectionalLight(0xffffff, 0.5)
+        const backLight = new THREE.DirectionalLight(0xffffff, BACK_LIGHT_INTENSITY)
         backLight.position.set(-5, 5, -5)
         this.scene.add(backLight)
 
@@ -187,7 +251,7 @@ export class SystemViewer {
         // - 45° field of view (natural perspective)
         // - Near plane at 0.1 units (can see objects very close)
         // - Far plane at 1000 units (can see objects far away)
-        this.camera = new THREE.PerspectiveCamera(45, aspect, 0.1, 1000)
+        this.camera = new THREE.PerspectiveCamera(CAMERA_FOV, aspect, CAMERA_NEAR, CAMERA_FAR)
 
         // =====================================================================
         // RENDERER SETUP
@@ -202,7 +266,7 @@ export class SystemViewer {
         this.renderer.setSize(this.canvas.clientWidth, this.canvas.clientHeight)
 
         // Limit pixel ratio for performance (retina displays can be 2-3x)
-        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+        this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, MAX_PIXEL_RATIO))
 
         // Use ACES Filmic tone mapping for cinematic look
         this.renderer.toneMapping = THREE.ACESFilmicToneMapping
@@ -218,11 +282,11 @@ export class SystemViewer {
 
         // Enable damping for smooth camera movement (momentum effect)
         this.controls.enableDamping = true
-        this.controls.dampingFactor = 0.05
+        this.controls.dampingFactor = CONTROLS_DAMPING
 
         // Enable auto-rotation by default
         this.controls.autoRotate = true
-        this.controls.autoRotateSpeed = 1.0
+        this.controls.autoRotateSpeed = AUTO_ROTATE_SPEED
 
         // Enable zoom for 3D interaction
         this.controls.enableZoom = true
@@ -255,8 +319,11 @@ export class SystemViewer {
         // =====================================================================
         // START ANIMATION LOOP
         // =====================================================================
-        // Begin continuous rendering
-        this.animate()
+        // Cache viewer container reference for label positioning
+        this._viewerContainer = document.getElementById('viewer-container')
+
+        // Begin continuous rendering (uses pre-bound method for performance)
+        this._boundAnimate()
     }
 
     /**
@@ -387,36 +454,16 @@ export class SystemViewer {
 
         // Create highlighted version of the material
         const highlightMat = part.userData.originalMaterial.clone()
-        highlightMat.emissive = new THREE.Color(0xffcc00) // Yellow glow
-        highlightMat.emissiveIntensity = 0.15              // Subtle glow
+        highlightMat.emissive = new THREE.Color(HIGHLIGHT_COLOR)
+        highlightMat.emissiveIntensity = HIGHLIGHT_INTENSITY
 
         // Apply the highlight material
         part.material = highlightMat
     }
 
-    /**
-     * Unhighlight parts (called from sidebar unhighlight - legacy version).
-     * 
-     * @param {string|string[]} partIds - Single part ID or array of part IDs
-     * @deprecated Use the second unhighlightPart method instead (duplicate exists below)
-     * @private
-     */
-    unhighlightPart(partIds) {
-        const ids = Array.isArray(partIds) ? partIds : [partIds]
+    // NOTE: Duplicate unhighlightPart method was removed during refactoring.
+    // The primary implementation is below (around line 646).
 
-        ids.forEach(partId => {
-            const part = this.parts.get(partId)
-            if (part && part.userData.originalMaterial) {
-                part.material = part.userData.originalMaterial
-            }
-            if (this.sidebarHighlightedParts) {
-                this.sidebarHighlightedParts.delete(partId)
-            }
-        })
-
-        // Resume rotation if no parts highlighted
-        // (Intentionally left empty - rotation control is handled elsewhere)
-    }
 
     /**
      * Create a floating label above a highlighted part.
@@ -442,7 +489,10 @@ export class SystemViewer {
         label.textContent = displayName
 
         // Add to the viewer container (positioned absolutely)
-        document.getElementById('viewer-container').appendChild(label)
+        // Uses cached reference for performance
+        if (this._viewerContainer) {
+            this._viewerContainer.appendChild(label)
+        }
 
         // Store reference for updating position and cleanup
         this.partLabels.set(partName, label)
@@ -472,23 +522,27 @@ export class SystemViewer {
      * @private
      */
     updateLabels() {
+        // Cache canvas dimensions for the loop (avoid repeated property access)
+        const canvasWidth = this.canvas.clientWidth
+        const canvasHeight = this.canvas.clientHeight
+
         this.partLabels.forEach((label, partName) => {
             const part = this.parts.get(partName)
             if (!part) return
 
-            // Get the center of the part's bounding box in world space
-            const box = new THREE.Box3().setFromObject(part)
-            const center = box.getCenter(new THREE.Vector3())
+            // Reuse temp objects to avoid GC pressure (called every frame)
+            this._tempBox.setFromObject(part)
+            this._tempBox.getCenter(this._tempCenter)
 
             // Project 3D position to normalized device coordinates
-            const screenPos = center.clone().project(this.camera)
+            this._tempScreenPos.copy(this._tempCenter).project(this.camera)
 
             // Convert NDC (-1 to 1) to CSS pixels
-            const x = (screenPos.x * 0.5 + 0.5) * this.canvas.clientWidth
-            const y = (-screenPos.y * 0.5 + 0.5) * this.canvas.clientHeight
+            const x = (this._tempScreenPos.x * 0.5 + 0.5) * canvasWidth
+            const y = (-this._tempScreenPos.y * 0.5 + 0.5) * canvasHeight
 
             // Hide label if part is behind camera
-            if (screenPos.z > 1) {
+            if (this._tempScreenPos.z > 1) {
                 label.style.display = 'none'
             } else {
                 label.style.display = 'block'
@@ -559,7 +613,7 @@ export class SystemViewer {
                 const maxDim = Math.max(size.x, size.y, size.z)
                 const fov = this.camera.fov * (Math.PI / 180)
                 let cameraDistance = Math.abs(maxDim / Math.sin(fov / 2))
-                cameraDistance *= 0.6 // Zoom in a bit closer
+                cameraDistance *= CAMERA_ZOOM_FACTOR
 
                 // Position camera at an angle for better perspective
                 this.camera.position.set(cameraDistance, cameraDistance * 0.7, cameraDistance)
@@ -615,8 +669,8 @@ export class SystemViewer {
 
                 // Create yellow highlight material
                 const highlightMat = part.userData.originalMaterial.clone()
-                highlightMat.emissive = new THREE.Color(0xffcc00) // Yellow
-                highlightMat.emissiveIntensity = 0.15
+                highlightMat.emissive = new THREE.Color(HIGHLIGHT_COLOR)
+                highlightMat.emissiveIntensity = HIGHLIGHT_INTENSITY
 
                 part.material = highlightMat
 
@@ -764,8 +818,8 @@ export class SystemViewer {
                     x: targetPos.x,
                     y: targetPos.y,
                     z: targetPos.z,
-                    duration: 1,
-                    ease: 'power2.out'    // Fast start, slow end
+                    duration: ANIMATION_DURATION,
+                    ease: 'power2.out'
                 })
             }
         })
@@ -794,8 +848,8 @@ export class SystemViewer {
                     x: originalPos.x,
                     y: originalPos.y,
                     z: originalPos.z,
-                    duration: 1,
-                    ease: 'power2.inOut'  // Smooth start and end
+                    duration: ANIMATION_DURATION,
+                    ease: 'power2.inOut'
                 })
             }
         })
@@ -846,8 +900,8 @@ export class SystemViewer {
      * @private
      */
     animate() {
-        // Schedule next frame
-        requestAnimationFrame(this.animate.bind(this))
+        // Schedule next frame (uses pre-bound method - no allocation per frame)
+        requestAnimationFrame(this._boundAnimate)
 
         // Update controls (applies damping, auto-rotate, etc.)
         this.controls.update()
